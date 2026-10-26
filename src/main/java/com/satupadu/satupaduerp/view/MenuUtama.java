@@ -1,15 +1,14 @@
 package com.satupadu.satupaduerp.view;
 
 import com.satupadu.satupaduerp.Session;
-import com.satupadu.satupaduerp.dao.DashboardDAO;
-import com.satupadu.satupaduerp.dao.ProductDAO;
+import com.satupadu.satupaduerp.controller.DashboardController;
+import com.satupadu.satupaduerp.controller.LoginController;
 import com.satupadu.satupaduerp.model.Product;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,8 +23,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class MenuUtama extends JFrame {
-    private final DashboardDAO dashboardDAO = new DashboardDAO();
-    private final ProductDAO productDAO = new ProductDAO();
+    private final DashboardController controller = new DashboardController();
 
     private final JLabel lblPenjualan = nilai();
     private final JLabel lblKas = nilai();
@@ -169,20 +167,20 @@ public class MenuUtama extends JFrame {
 
     private void loadDashboard() {
         try {
-            lblPenjualan.setText(Tema.rupiah(dashboardDAO.penjualanBulanIni()));
-            lblKas.setText(Tema.rupiah(dashboardDAO.saldoKas()));
-            lblProduk.setText(String.valueOf(dashboardDAO.jumlahProduk()));
-            lblMitra.setText(dashboardDAO.jumlahPelanggan() + " / " + dashboardDAO.jumlahSupplier());
+            controller.muatData();
+            lblPenjualan.setText(Tema.rupiah(controller.getPenjualanBulanIni()));
+            lblKas.setText(Tema.rupiah(controller.getSaldoKas()));
+            lblProduk.setText(String.valueOf(controller.getJumlahProduk()));
+            lblMitra.setText(controller.getJumlahPelanggan() + " / " + controller.getJumlahSupplier());
 
             modelMenipis.setRowCount(0);
-            for (Product p : productDAO.getStokMenipis()) {
+            for (Product p : controller.getStokMenipis()) {
                 modelMenipis.addRow(new Object[]{
                     p.getProductCode(), p.getProductName(), p.getStock(), p.getMinimumStock()
                 });
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal memuat dashboard: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -201,7 +199,7 @@ public class MenuUtama extends JFrame {
         int pilih = JOptionPane.showConfirmDialog(this, "Yakin ingin logout?", "Logout",
             JOptionPane.YES_NO_OPTION);
         if (pilih == JOptionPane.YES_OPTION) {
-            Session.clear();
+            new LoginController().logout();
             dispose();
             new FormLogin().setVisible(true);
         }

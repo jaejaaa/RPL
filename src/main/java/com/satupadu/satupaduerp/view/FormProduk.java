@@ -1,6 +1,6 @@
 package com.satupadu.satupaduerp.view;
 
-import com.satupadu.satupaduerp.dao.ProductDAO;
+import com.satupadu.satupaduerp.controller.ProductController;
 import com.satupadu.satupaduerp.model.Product;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,8 +10,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -31,7 +29,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class FormProduk extends JDialog {
-    private final ProductDAO productDAO = new ProductDAO();
+    private final ProductController controller = new ProductController();
     private List<Product> daftarProduk = new ArrayList<>();
     private int selectedId = 0;   // 0 = mode tambah, selain itu = mode ubah
 
@@ -165,7 +163,7 @@ public class FormProduk extends JDialog {
     // ---------------- data ----------------
     private void loadData() {
         try {
-            daftarProduk = productDAO.getAll(txtCari.getText().trim());
+            daftarProduk = controller.cari(txtCari.getText());
             model.setRowCount(0);
             for (Product p : daftarProduk) {
                 model.addRow(new Object[]{
@@ -174,8 +172,8 @@ public class FormProduk extends JDialog {
                     p.getStock(), p.getMinimumStock()
                 });
             }
-        } catch (SQLException e) {
-            error("Gagal memuat data produk: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            error(e.getMessage());
         }
     }
 
@@ -215,27 +213,16 @@ public class FormProduk extends JDialog {
     }
 
     private void simpan() {
-        Product p = ambilInput();
-        if (p == null) {
-            return;
-        }
+        Object satuan = cmbSatuan.getSelectedItem();
         try {
-            if (selectedId == 0) {
-                productDAO.insert(p);
-                info("Produk berhasil ditambahkan.");
-            } else {
-                p.setProductId(selectedId);
-                productDAO.update(p);
-                info("Produk berhasil diubah.");
-            }
+            String pesan = controller.simpan(selectedId, txtKode.getText(), txtNama.getText(),
+                satuan == null ? "" : satuan.toString(), txtHargaBeli.getText(),
+                txtHargaJual.getText(), txtStok.getText(), txtStokMin.getText());
+            info(pesan);
             bersihkan();
             loadData();
-        } catch (SQLException e) {
-            if (e.getErrorCode() == 1062) {   // duplicate entry
-                error("Kode produk " + p.getProductCode() + " sudah dipakai.");
-            } else {
-                error("Gagal menyimpan: " + e.getMessage());
-            }
+        } catch (IllegalArgumentException e) {
+            error(e.getMessage());
         }
     }
 
@@ -249,48 +236,11 @@ public class FormProduk extends JDialog {
             return;
         }
         try {
-            productDAO.delete(selectedId);
-            info("Produk berhasil dihapus.");
+            info(controller.hapus(selectedId));
             bersihkan();
             loadData();
-        } catch (SQLException e) {
-            if (e.getErrorCode() == 1451) {   // masih dipakai tabel lain (foreign key)
-                error("Produk tidak bisa dihapus karena sudah dipakai di transaksi.");
-            } else {
-                error("Gagal menghapus: " + e.getMessage());
-            }
-        }
-    }
-
-    // validasi input, mengembalikan null jika ada yang salah
-    private Product ambilInput() {
-        String kode = txtKode.getText().trim();
-        String nama = txtNama.getText().trim();
-        Object satuan = cmbSatuan.getSelectedItem();
-
-        if (kode.isEmpty() || nama.isEmpty() || satuan == null || satuan.toString().isBlank()) {
-            error("Kode, nama, dan satuan wajib diisi.");
-            return null;
-        }
-        try {
-            Product p = new Product();
-            p.setProductCode(kode);
-            p.setProductName(nama);
-            p.setUnit(satuan.toString().trim());
-            p.setPurchasePrice(new BigDecimal(txtHargaBeli.getText().trim()));
-            p.setSellingPrice(new BigDecimal(txtHargaJual.getText().trim()));
-            p.setStock(Integer.parseInt(txtStok.getText().trim()));
-            p.setMinimumStock(Integer.parseInt(txtStokMin.getText().trim()));
-
-            if (p.getPurchasePrice().signum() < 0 || p.getSellingPrice().signum() < 0
-                    || p.getStock() < 0 || p.getMinimumStock() < 0) {
-                error("Harga dan stok tidak boleh negatif.");
-                return null;
-            }
-            return p;
-        } catch (NumberFormatException e) {
-            error("Harga dan stok harus berupa angka (tanpa titik/koma).");
-            return null;
+        } catch (IllegalArgumentException e) {
+            error(e.getMessage());
         }
     }
 

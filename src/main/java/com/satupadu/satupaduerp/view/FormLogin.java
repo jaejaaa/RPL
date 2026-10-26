@@ -1,8 +1,6 @@
 package com.satupadu.satupaduerp.view;
 
-import com.satupadu.satupaduerp.Session;
-import com.satupadu.satupaduerp.dao.UserDAO;
-import com.satupadu.satupaduerp.model.User;
+import com.satupadu.satupaduerp.controller.LoginController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,7 +8,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,7 +21,7 @@ public class FormLogin extends JFrame {
     private final JTextField txtUsername = new JTextField();
     private final JPasswordField txtPassword = new JPasswordField();
     private final JButton btnLogin = Tema.tombol("Login", true);
-    private final UserDAO userDAO = new UserDAO();
+    private final LoginController controller = new LoginController();
 
     public FormLogin() {
         setTitle("SIMERP - Login");
@@ -90,30 +87,14 @@ public class FormLogin extends JFrame {
     }
 
     private void login() {
-        String username = txtUsername.getText().trim();
-        String password = new String(txtPassword.getPassword());
-
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username dan password wajib diisi.",
-                "Login", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
         try {
-            User user = userDAO.login(username, password);
-            if (user == null) {
-                JOptionPane.showMessageDialog(this, "Username atau password salah.",
-                    "Login Gagal", JOptionPane.ERROR_MESSAGE);
-                txtPassword.setText("");
-                txtPassword.requestFocus();
-                return;
-            }
-            Session.setUser(user);
+            controller.login(txtUsername.getText().trim(), new String(txtPassword.getPassword()));
             new MenuUtama().setVisible(true);
             dispose();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Gagal terhubung ke database.\nPastikan MySQL di XAMPP sudah berjalan.\n\n"
-                + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Login Gagal", JOptionPane.WARNING_MESSAGE);
+            txtPassword.setText("");
+            txtPassword.requestFocus();
         }
     }
 }
