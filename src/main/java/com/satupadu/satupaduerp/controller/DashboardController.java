@@ -3,8 +3,8 @@ package com.satupadu.satupaduerp.controller;
 import com.satupadu.satupaduerp.dao.DashboardDAO;
 import com.satupadu.satupaduerp.dao.ProductDAO;
 import com.satupadu.satupaduerp.model.Product;
+import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 
 // penghubung antara MenuUtama (view) dengan DashboardDAO & ProductDAO (model)
@@ -14,9 +14,9 @@ public class DashboardController {
 
     private BigDecimal penjualanBulanIni;
     private BigDecimal saldoKas;
-    private int jumlahProduk;
-    private int jumlahPelanggan;
-    private int jumlahSupplier;
+    private long jumlahProduk;
+    private long jumlahPelanggan;
+    private long jumlahSupplier;
     private List<Product> stokMenipis;
 
     // ambil semua data ringkasan sekaligus, lalu view tinggal membaca lewat getter
@@ -28,7 +28,7 @@ public class DashboardController {
             jumlahPelanggan = dashboardDAO.jumlahPelanggan();
             jumlahSupplier = dashboardDAO.jumlahSupplier();
             stokMenipis = productDAO.getStokMenipis();
-        } catch (SQLException e) {
+        } catch (PersistenceException e) {
             throw new IllegalArgumentException("Gagal memuat dashboard: " + e.getMessage());
         }
     }
@@ -41,15 +41,15 @@ public class DashboardController {
         return saldoKas;
     }
 
-    public int getJumlahProduk() {
+    public long getJumlahProduk() {
         return jumlahProduk;
     }
 
-    public int getJumlahPelanggan() {
+    public long getJumlahPelanggan() {
         return jumlahPelanggan;
     }
 
-    public int getJumlahSupplier() {
+    public long getJumlahSupplier() {
         return jumlahSupplier;
     }
 

@@ -54,8 +54,8 @@ public class MenuUtama extends JFrame {
 
         JMenu master = new JMenu("Master Data");
         master.add(item("Data Produk", e -> bukaProduk(), "Purchasing"));
-        master.add(item("Data Pelanggan", e -> belumTersedia(), "Sales"));
-        master.add(item("Data Supplier", e -> belumTersedia(), "Purchasing"));
+        master.add(item("Data Pelanggan", e -> bukaPelanggan(), "Sales"));
+        master.add(item("Data Supplier", e -> bukaSupplier(), "Purchasing"));
 
         JMenu penjualan = new JMenu("Penjualan");
         penjualan.add(item("Sales Order", e -> belumTersedia(), "Sales"));
@@ -187,6 +187,16 @@ public class MenuUtama extends JFrame {
     // ---------------- aksi menu ----------------
     private void bukaProduk() {
         new FormProduk(this).setVisible(true);   // modal: baris ini lanjut setelah form ditutup
+        loadDashboard();
+    }
+
+    private void bukaPelanggan() {
+        new FormPelanggan(this).setVisible(true);
+        loadDashboard();
+    }
+
+    private void bukaSupplier() {
+        new FormSupplier(this).setVisible(true);
         loadDashboard();
     }
 

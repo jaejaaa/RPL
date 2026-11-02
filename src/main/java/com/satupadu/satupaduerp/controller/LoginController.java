@@ -3,7 +3,7 @@ package com.satupadu.satupaduerp.controller;
 import com.satupadu.satupaduerp.Session;
 import com.satupadu.satupaduerp.dao.UserDAO;
 import com.satupadu.satupaduerp.model.User;
-import java.sql.SQLException;
+import jakarta.persistence.PersistenceException;
 
 // penghubung antara FormLogin (view) dengan UserDAO (model)
 public class LoginController {
@@ -20,7 +20,7 @@ public class LoginController {
                 throw new IllegalArgumentException("Username atau password salah.");
             }
             Session.setUser(user);
-        } catch (SQLException e) {
+        } catch (PersistenceException e) {
             throw new IllegalArgumentException("Gagal terhubung ke database.\n"
                 + "Pastikan MySQL di XAMPP sudah berjalan.");
         }

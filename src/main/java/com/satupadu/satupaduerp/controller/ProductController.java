@@ -2,8 +2,8 @@ package com.satupadu.satupaduerp.controller;
 
 import com.satupadu.satupaduerp.dao.ProductDAO;
 import com.satupadu.satupaduerp.model.Product;
+import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 
 // penghubung antara FormProduk (view) dengan ProductDAO (model)
@@ -14,7 +14,7 @@ public class ProductController {
     public List<Product> cari(String keyword) {
         try {
             return productDAO.getAll(keyword.trim());
-        } catch (SQLException e) {
+        } catch (PersistenceException e) {
             throw new IllegalArgumentException("Gagal memuat data produk: " + e.getMessage());
         }
     }
@@ -31,8 +31,8 @@ public class ProductController {
             p.setProductId(productId);
             productDAO.update(p);
             return "Produk berhasil diubah.";
-        } catch (SQLException e) {
-            if (e.getErrorCode() == 1062) {   // duplicate entry
+        } catch (PersistenceException e) {
+            if (KodeError.dari(e) == KodeError.DATA_KEMBAR) {
                 throw new IllegalArgumentException("Kode produk " + p.getProductCode() + " sudah dipakai.");
             }
             throw new IllegalArgumentException("Gagal menyimpan: " + e.getMessage());
@@ -43,8 +43,8 @@ public class ProductController {
         try {
             productDAO.delete(productId);
             return "Produk berhasil dihapus.";
-        } catch (SQLException e) {
-            if (e.getErrorCode() == 1451) {   // masih dipakai tabel lain (foreign key)
+        } catch (PersistenceException e) {
+            if (KodeError.dari(e) == KodeError.MASIH_DIPAKAI) {
                 throw new IllegalArgumentException("Produk tidak bisa dihapus karena sudah dipakai di transaksi.");
             }
             throw new IllegalArgumentException("Gagal menghapus: " + e.getMessage());

@@ -1,44 +1,45 @@
 package com.satupadu.satupaduerp.dao;
 
-import com.satupadu.satupaduerp.Koneksi;
+import com.satupadu.satupaduerp.HibernateUtil;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.hibernate.Session;
 
 // query ringkasan untuk halaman dashboard
 public class DashboardDAO {
 
-    public int jumlahProduk() throws SQLException {
-        return angka("SELECT COUNT(*) FROM products").intValue();
+    public long jumlahProduk() {
+        return hitung("SELECT COUNT(p) FROM Product p");
     }
 
-    public int jumlahPelanggan() throws SQLException {
-        return angka("SELECT COUNT(*) FROM customers").intValue();
+    public long jumlahPelanggan() {
+        return hitung("SELECT COUNT(c) FROM Customer c");
     }
 
-    public int jumlahSupplier() throws SQLException {
-        return angka("SELECT COUNT(*) FROM suppliers").intValue();
+    public long jumlahSupplier() {
+        return hitung("SELECT COUNT(s) FROM Supplier s");
     }
 
-    public BigDecimal penjualanBulanIni() throws SQLException {
-        return angka("SELECT COALESCE(SUM(total_amount), 0) FROM sales_orders "
+    // tabel sales_orders & transactions belum dipetakan ke class, jadi masih memakai native SQL
+    public BigDecimal penjualanBulanIni() {
+        return total("SELECT COALESCE(SUM(total_amount), 0) FROM sales_orders "
                    + "WHERE status = 'Dikonfirmasi' "
                    + "AND MONTH(order_date) = MONTH(CURDATE()) AND YEAR(order_date) = YEAR(CURDATE())");
     }
 
-    public BigDecimal saldoKas() throws SQLException {
-        return angka("SELECT COALESCE(SUM(CASE WHEN type = 'Pemasukan' THEN amount ELSE -amount END), 0) "
+    public BigDecimal saldoKas() {
+        return total("SELECT COALESCE(SUM(CASE WHEN type = 'Pemasukan' THEN amount ELSE -amount END), 0) "
                    + "FROM transactions");
     }
 
-    private BigDecimal angka(String sql) throws SQLException {
-        try (Connection c = Koneksi.getConnection();
-             Statement st = c.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            rs.next();
-            return rs.getBigDecimal(1);
+    private long hitung(String hql) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(hql, Long.class).getSingleResult();
+        }
+    }
+
+    private BigDecimal total(String sql) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createNativeQuery(sql, BigDecimal.class).getSingleResult();
         }
     }
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- koneksi ke database -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/simerp</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password"></property>
+
+        <!-- dialek SQL sesuai database di XAMPP (MariaDB 10.4) -->
+        <property name="hibernate.boot.allow_jdbc_metadata_access">false</property>
+        <property name="jakarta.persistence.database-product-name">MariaDB</property>
+        <property name="jakarta.persistence.database-major-version">10</property>
+        <property name="jakarta.persistence.database-minor-version">4</property>
+
+        <!-- tampilkan SQL yang dibuat Hibernate di Output -->
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- struktur tabel tetap mengikuti database/simerp.sql, tidak diubah otomatis -->
+        <property name="hibernate.hbm2ddl.auto">none</property>
+
+        <!-- class yang dipetakan ke tabel -->
+        <mapping class="com.satupadu.satupaduerp.model.Role"/>
+        <mapping class="com.satupadu.satupaduerp.model.User"/>
+        <mapping class="com.satupadu.satupaduerp.model.Product"/>
+        <mapping class="com.satupadu.satupaduerp.model.Customer"/>
+        <mapping class="com.satupadu.satupaduerp.model.Supplier"/>
+    </session-factory>
+</hibernate-configuration>
