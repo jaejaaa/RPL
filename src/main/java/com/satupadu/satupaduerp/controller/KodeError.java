@@ -2,7 +2,7 @@ package com.satupadu.satupaduerp.controller;
 
 import java.sql.SQLException;
 
-// mencari kode error MySQL di dalam exception dari Hibernate
+// mencari kode error MySQL di dalam DataAccessException dari Spring
 class KodeError {
     static final int DATA_KEMBAR = 1062;        // nilai UNIQUE sudah dipakai
     static final int MASIH_DIPAKAI = 1451;      // masih dirujuk tabel lain (foreign key)

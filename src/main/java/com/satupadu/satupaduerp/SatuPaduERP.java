@@ -5,6 +5,7 @@
 package com.satupadu.satupaduerp;
 
 import com.satupadu.satupaduerp.view.FormLogin;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -20,6 +21,13 @@ public class SatuPaduERP {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             // kalau gagal, pakai tampilan bawaan Java
+        }
+        try {
+            SpringContext.start();   // Spring membuat semua bean (SessionFactory, DAO, controller)
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Aplikasi gagal dijalankan:\n" + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         }
         SwingUtilities.invokeLater(() -> new FormLogin().setVisible(true));
     }

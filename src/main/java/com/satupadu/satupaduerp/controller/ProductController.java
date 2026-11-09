@@ -2,19 +2,27 @@ package com.satupadu.satupaduerp.controller;
 
 import com.satupadu.satupaduerp.dao.ProductDAO;
 import com.satupadu.satupaduerp.model.Product;
-import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.util.List;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionException;
 
 // penghubung antara FormProduk (view) dengan ProductDAO (model)
 // jika gagal, setiap method melempar IllegalArgumentException berisi pesan untuk ditampilkan view
+@Component
 public class ProductController {
-    private final ProductDAO productDAO = new ProductDAO();
+    private final ProductDAO productDAO;
+
+    // dependency injection lewat constructor: objek DAO disediakan oleh Spring
+    public ProductController(ProductDAO productDAO) {
+        this.productDAO = productDAO;
+    }
 
     public List<Product> cari(String keyword) {
         try {
             return productDAO.getAll(keyword.trim());
-        } catch (PersistenceException e) {
+        } catch (DataAccessException | TransactionException e) {
             throw new IllegalArgumentException("Gagal memuat data produk: " + e.getMessage());
         }
     }
@@ -31,7 +39,7 @@ public class ProductController {
             p.setProductId(productId);
             productDAO.update(p);
             return "Produk berhasil diubah.";
-        } catch (PersistenceException e) {
+        } catch (DataAccessException | TransactionException e) {
             if (KodeError.dari(e) == KodeError.DATA_KEMBAR) {
                 throw new IllegalArgumentException("Kode produk " + p.getProductCode() + " sudah dipakai.");
             }
@@ -43,7 +51,7 @@ public class ProductController {
         try {
             productDAO.delete(productId);
             return "Produk berhasil dihapus.";
-        } catch (PersistenceException e) {
+        } catch (DataAccessException | TransactionException e) {
             if (KodeError.dari(e) == KodeError.MASIH_DIPAKAI) {
                 throw new IllegalArgumentException("Produk tidak bisa dihapus karena sudah dipakai di transaksi.");
             }

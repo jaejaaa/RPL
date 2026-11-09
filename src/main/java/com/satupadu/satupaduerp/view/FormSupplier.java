@@ -1,5 +1,6 @@
 package com.satupadu.satupaduerp.view;
 
+import com.satupadu.satupaduerp.SpringContext;
 import com.satupadu.satupaduerp.controller.SupplierController;
 import com.satupadu.satupaduerp.model.Supplier;
 import java.awt.BorderLayout;
@@ -29,7 +30,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class FormSupplier extends JDialog {
-    private final SupplierController controller = new SupplierController();
+    private final SupplierController controller = SpringContext.getBean(SupplierController.class);
     private List<Supplier> daftarSupplier = new ArrayList<>();
     private int selectedId = 0;   // 0 = mode tambah, selain itu = mode ubah
 

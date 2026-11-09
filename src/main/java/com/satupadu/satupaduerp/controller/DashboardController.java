@@ -3,14 +3,17 @@ package com.satupadu.satupaduerp.controller;
 import com.satupadu.satupaduerp.dao.DashboardDAO;
 import com.satupadu.satupaduerp.dao.ProductDAO;
 import com.satupadu.satupaduerp.model.Product;
-import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.util.List;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionException;
 
 // penghubung antara MenuUtama (view) dengan DashboardDAO & ProductDAO (model)
+@Component
 public class DashboardController {
-    private final DashboardDAO dashboardDAO = new DashboardDAO();
-    private final ProductDAO productDAO = new ProductDAO();
+    private final DashboardDAO dashboardDAO;
+    private final ProductDAO productDAO;
 
     private BigDecimal penjualanBulanIni;
     private BigDecimal saldoKas;
@@ -18,6 +21,12 @@ public class DashboardController {
     private long jumlahPelanggan;
     private long jumlahSupplier;
     private List<Product> stokMenipis;
+
+    // dependency injection lewat constructor: objek DAO disediakan oleh Spring
+    public DashboardController(DashboardDAO dashboardDAO, ProductDAO productDAO) {
+        this.dashboardDAO = dashboardDAO;
+        this.productDAO = productDAO;
+    }
 
     // ambil semua data ringkasan sekaligus, lalu view tinggal membaca lewat getter
     public void muatData() {
@@ -28,7 +37,7 @@ public class DashboardController {
             jumlahPelanggan = dashboardDAO.jumlahPelanggan();
             jumlahSupplier = dashboardDAO.jumlahSupplier();
             stokMenipis = productDAO.getStokMenipis();
-        } catch (PersistenceException e) {
+        } catch (DataAccessException | TransactionException e) {
             throw new IllegalArgumentException("Gagal memuat dashboard: " + e.getMessage());
         }
     }

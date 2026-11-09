@@ -1,5 +1,6 @@
 package com.satupadu.satupaduerp.view;
 
+import com.satupadu.satupaduerp.SpringContext;
 import com.satupadu.satupaduerp.controller.LoginController;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,7 +22,7 @@ public class FormLogin extends JFrame {
     private final JTextField txtUsername = new JTextField();
     private final JPasswordField txtPassword = new JPasswordField();
     private final JButton btnLogin = Tema.tombol("Login", true);
-    private final LoginController controller = new LoginController();
+    private final LoginController controller = SpringContext.getBean(LoginController.class);
 
     public FormLogin() {
         setTitle("SIMERP - Login");

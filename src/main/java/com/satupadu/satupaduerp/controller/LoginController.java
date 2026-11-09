@@ -3,11 +3,19 @@ package com.satupadu.satupaduerp.controller;
 import com.satupadu.satupaduerp.Session;
 import com.satupadu.satupaduerp.dao.UserDAO;
 import com.satupadu.satupaduerp.model.User;
-import jakarta.persistence.PersistenceException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionException;
 
 // penghubung antara FormLogin (view) dengan UserDAO (model)
+@Component
 public class LoginController {
-    private final UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO;
+
+    // dependency injection lewat constructor: objek DAO disediakan oleh Spring
+    public LoginController(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
 
     // jika gagal, melempar IllegalArgumentException berisi pesan untuk ditampilkan view
     public void login(String username, String password) {
@@ -20,7 +28,7 @@ public class LoginController {
                 throw new IllegalArgumentException("Username atau password salah.");
             }
             Session.setUser(user);
-        } catch (PersistenceException e) {
+        } catch (DataAccessException | TransactionException e) {
             throw new IllegalArgumentException("Gagal terhubung ke database.\n"
                 + "Pastikan MySQL di XAMPP sudah berjalan.");
         }

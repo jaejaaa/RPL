@@ -1,5 +1,6 @@
 package com.satupadu.satupaduerp.view;
 
+import com.satupadu.satupaduerp.SpringContext;
 import com.satupadu.satupaduerp.Session;
 import com.satupadu.satupaduerp.controller.DashboardController;
 import com.satupadu.satupaduerp.controller.LoginController;
@@ -23,7 +24,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class MenuUtama extends JFrame {
-    private final DashboardController controller = new DashboardController();
+    private final DashboardController controller = SpringContext.getBean(DashboardController.class);
 
     private final JLabel lblPenjualan = nilai();
     private final JLabel lblKas = nilai();
@@ -58,7 +59,7 @@ public class MenuUtama extends JFrame {
         master.add(item("Data Supplier", e -> bukaSupplier(), "Purchasing"));
 
         JMenu penjualan = new JMenu("Penjualan");
-        penjualan.add(item("Sales Order", e -> belumTersedia(), "Sales"));
+        penjualan.add(item("Sales Order", e -> bukaSalesOrder(), "Sales"));
 
         JMenu pembelian = new JMenu("Pembelian");
         pembelian.add(item("Purchase Order", e -> belumTersedia(), "Purchasing"));
@@ -200,6 +201,11 @@ public class MenuUtama extends JFrame {
         loadDashboard();
     }
 
+    private void bukaSalesOrder() {
+        new FormSalesOrder(this).setVisible(true);
+        loadDashboard();
+    }
+
     private void belumTersedia() {
         JOptionPane.showMessageDialog(this, "Fitur ini akan dibuat pada pertemuan berikutnya.",
             "Belum Tersedia", JOptionPane.INFORMATION_MESSAGE);
@@ -209,7 +215,7 @@ public class MenuUtama extends JFrame {
         int pilih = JOptionPane.showConfirmDialog(this, "Yakin ingin logout?", "Logout",
             JOptionPane.YES_NO_OPTION);
         if (pilih == JOptionPane.YES_OPTION) {
-            new LoginController().logout();
+            SpringContext.getBean(LoginController.class).logout();
             dispose();
             new FormLogin().setVisible(true);
         }

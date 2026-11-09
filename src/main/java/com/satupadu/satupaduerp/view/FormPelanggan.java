@@ -1,5 +1,6 @@
 package com.satupadu.satupaduerp.view;
 
+import com.satupadu.satupaduerp.SpringContext;
 import com.satupadu.satupaduerp.controller.CustomerController;
 import com.satupadu.satupaduerp.model.Customer;
 import java.awt.BorderLayout;
@@ -29,7 +30,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class FormPelanggan extends JDialog {
-    private final CustomerController controller = new CustomerController();
+    private final CustomerController controller = SpringContext.getBean(CustomerController.class);
     private List<Customer> daftarPelanggan = new ArrayList<>();
     private int selectedId = 0;   // 0 = mode tambah, selain itu = mode ubah
 

@@ -1,33 +1,16 @@
 package com.satupadu.satupaduerp.dao;
 
-import com.satupadu.satupaduerp.HibernateUtil;
 import com.satupadu.satupaduerp.model.Customer;
 import java.util.List;
-import org.hibernate.Session;
 
-public class CustomerDAO {
+public interface CustomerDAO {
+    List<Customer> getAll(String keyword);
 
-    public List<Customer> getAll(String keyword) {
-        String hql = "FROM Customer c WHERE c.customerName LIKE :kata OR c.phone LIKE :kata "
-                   + "ORDER BY c.customerName";
+    Customer findById(int customerId);
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery(hql, Customer.class)
-                .setParameter("kata", "%" + keyword + "%")
-                .list();
-        }
-    }
+    void insert(Customer c);
 
-    public void insert(Customer c) {
-        HibernateUtil.getSessionFactory().inTransaction(session -> session.persist(c));
-    }
+    void update(Customer c);
 
-    public void update(Customer c) {
-        HibernateUtil.getSessionFactory().inTransaction(session -> session.merge(c));
-    }
-
-    public void delete(int customerId) {
-        HibernateUtil.getSessionFactory().inTransaction(session ->
-            session.remove(session.find(Customer.class, customerId)));
-    }
+    void delete(int customerId);
 }

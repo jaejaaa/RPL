@@ -2,17 +2,25 @@ package com.satupadu.satupaduerp.controller;
 
 import com.satupadu.satupaduerp.dao.CustomerDAO;
 import com.satupadu.satupaduerp.model.Customer;
-import jakarta.persistence.PersistenceException;
 import java.util.List;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionException;
 
 // penghubung antara FormPelanggan (view) dengan CustomerDAO (model)
+@Component
 public class CustomerController {
-    private final CustomerDAO customerDAO = new CustomerDAO();
+    private final CustomerDAO customerDAO;
+
+    // dependency injection lewat constructor: objek DAO disediakan oleh Spring
+    public CustomerController(CustomerDAO customerDAO) {
+        this.customerDAO = customerDAO;
+    }
 
     public List<Customer> cari(String keyword) {
         try {
             return customerDAO.getAll(keyword.trim());
-        } catch (PersistenceException e) {
+        } catch (DataAccessException | TransactionException e) {
             throw new IllegalArgumentException("Gagal memuat data pelanggan: " + e.getMessage());
         }
     }
@@ -34,7 +42,7 @@ public class CustomerController {
             }
             customerDAO.update(c);
             return "Pelanggan berhasil diubah.";
-        } catch (PersistenceException e) {
+        } catch (DataAccessException | TransactionException e) {
             throw new IllegalArgumentException("Gagal menyimpan: " + e.getMessage());
         }
     }
@@ -43,7 +51,7 @@ public class CustomerController {
         try {
             customerDAO.delete(customerId);
             return "Pelanggan berhasil dihapus.";
-        } catch (PersistenceException e) {
+        } catch (DataAccessException | TransactionException e) {
             if (KodeError.dari(e) == KodeError.MASIH_DIPAKAI) {
                 throw new IllegalArgumentException("Pelanggan tidak bisa dihapus karena sudah dipakai di sales order.");
             }

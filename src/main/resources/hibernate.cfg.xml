@@ -4,11 +4,7 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <!-- koneksi ke database -->
-        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/simerp</property>
-        <property name="hibernate.connection.username">root</property>
-        <property name="hibernate.connection.password"></property>
+        <!-- koneksi database (DataSource) diatur oleh Spring di config/AppConfig.java -->
 
         <!-- dialek SQL sesuai database di XAMPP (MariaDB 10.4) -->
         <property name="hibernate.boot.allow_jdbc_metadata_access">false</property>
@@ -28,5 +24,9 @@
         <mapping class="com.satupadu.satupaduerp.model.Product"/>
         <mapping class="com.satupadu.satupaduerp.model.Customer"/>
         <mapping class="com.satupadu.satupaduerp.model.Supplier"/>
+        <mapping class="com.satupadu.satupaduerp.model.SalesOrder"/>
+        <mapping class="com.satupadu.satupaduerp.model.SalesOrderItem"/>
+        <mapping class="com.satupadu.satupaduerp.model.StockMovement"/>
+        <mapping class="com.satupadu.satupaduerp.model.CashTransaction"/>
     </session-factory>
 </hibernate-configuration>
